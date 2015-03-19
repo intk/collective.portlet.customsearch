@@ -43,9 +43,18 @@
               value="Search"
               i18n:attributes="value label_search;"/>
 
-          <input type="hidden"
-              name="path"
-              tal:attributes="value search_parameter;"/>
+          <tal:inputs repeat="input search_parameter">
+            <tal:values tal:define="values python: input.get('values');
+                                    name python: input.get('name');">
+                
+              <tal:block repeat="value values">
+                <input type="hidden"
+                  name=""
+                  tal:attributes="value value;
+                                  name name;"/>
+              </tal:block>
+            </tal:values>
+          </tal:inputs>
 
           <div class="LSResult" style=""
                tal:condition="livesearch"

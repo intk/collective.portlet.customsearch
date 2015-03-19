@@ -8,7 +8,8 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from plone.app.portlets import PloneMessageFactory as _
 from plone.app.portlets.portlets import base
-
+from urlparse import parse_qs, urlparse
+        
 
 class ISearchPortlet(IPortletDataProvider):
     """ A portlet displaying a (live) search box
@@ -72,6 +73,17 @@ class Renderer(base.Renderer):
         return self.data.portlet_title or _(u"Search")
 
     def search_parameter(self):
+        params = parse_qs(urlparse(self.data.search_parameter).query, keep_blank_values=True)
+        params_keys = params.keys()
+
+        inputs = []
+
+        for key in params:
+            inputs.append({'name': key, 'values': params[key]})
+
+        if len(inputs) > 0:
+            return inputs
+
         return self.data.search_parameter or _(u"")
 
     def search_placeholder(self):
