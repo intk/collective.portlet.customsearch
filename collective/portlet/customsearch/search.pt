@@ -2,79 +2,91 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       tal:omit-tag="">
-<dl class="portlet portletSearch"
+<section class="portlet portletSearch" role="search"
     i18n:domain="plone">
 
-  <dt class="portletHeader">
-      <span class="portletTopLeft"></span>
-      <a class="tile"
-         tal:attributes="href view/search_action">
-        <tal:header
-           condition="not:view/portlet_title|nothing"
-           i18n:translate="box_search">Search</tal:header>
-        <tal:header
-           condition="view/portlet_title|nothing"
-           tal:content="view/portlet_title">Search</tal:header>
-      </a>
-      <span class="portletTopRight"></span>
-  </dt>
+  <header class="portletHeader">
+      <h1 class="item-title">
+        <a class="tile"
+           tal:attributes="href view/search_action">
+          <tal:header
+             condition="not:view/data/title|nothing"
+             i18n:translate="box_search">Search</tal:header>
+          <tal:header
+             condition="view/data/title|nothing"
+             tal:content="view/data/title">Search</tal:header>
+        </a>
+      </h1>
+  </header>
 
-    <dd class="portletItem">
+  <section class="portletContent">
       <form id="searchform" action="search"
             tal:define="livesearch view/enable_livesearch;
                         search_placeholder view/search_placeholder;
                         search_parameter view/search_parameter;"
             tal:attributes="action view/search_action;
-                            data-action view/action;">
+                            data-action view/search_action;
+                            class python: 'search-form' if not getattr(view.data, 'activate_facetednavigation', '') else 'search-form-faceted'">
+
         <div class="LSBox">
           <input class="searchField"
-              name="SearchableText"
+              name="c5"
               type="text"
               size="15"
               title="Search Site"
-              i18n:attributes="title title_search_title;"
+              placeholder="Search Site"
+              i18n:attributes="title title_search_title;
+                               placeholder search_placeholder;"
               tal:attributes="value request/SearchableText|nothing;
                               class python:livesearch and 'searchField portlet-search-gadget' or 'searchField portlet-search-gadget-nols';
-                              placeholder search_placeholder;"
+                              placeholder search_placeholder;
+                              name python:'c5' if getattr(view.data, 'activate_facetednavigation', '') else 'SearchableText';"
+
+
               />
 
-          <input class="searchButton"
+              <input class="searchButton"
               type="submit"
               value="Search"
               i18n:attributes="value label_search;"/>
 
-          <tal:inputs repeat="input search_parameter">
-            <tal:values tal:define="values python: input.get('values');
-                                    name python: input.get('name');">
-                
-              <tal:block repeat="value values">
-                <input type="hidden"
-                  name=""
-                  tal:attributes="value value;
-                                  name name;"/>
-              </tal:block>
-            </tal:values>
-          </tal:inputs>
+              <tal:inputs repeat="input search_parameter">
+                <tal:values tal:define="values python: input.get('values');
+                                        name python: input.get('name');">
+                    
+                  <tal:block repeat="value values">
+                    <input type="hidden"
+                      name=""
+                      tal:attributes="value value;
+                                      name name;"/>
+                  </tal:block>
+                </tal:values>
+              </tal:inputs>
 
           <div class="LSResult" style=""
                tal:condition="livesearch"
                tal:attributes="data-livesearch view/livesearch_action;">
             <div class="LSShadow"></div>
           </div>
-        </div>
-      </form>
-      <div class="visualClear"><!-- --></div>
-    </dd>
+          <br/>
+          <div class="clearfix"></div>
 
-    <dd class="portletFooter">
+          <div class="visualClear div-advanced-search" tal:condition="view/show_advanced_search">
+          <a class="advanced-search" tal:attributes="href python:'/%s/@@advancedsearch' %(getattr(context,'language', 'nl'))" i18n:translate="label_advanced_search">Advanced search</a>
+        </div>
+        </div>
+
+        
+      </form>
+    </section>
+
+    <footer class="portletFooter">
         <a href="#"
          class="tile"
          tal:attributes="href view/search_action"
          i18n:translate="label_advanced_search">
         Advanced Search&hellip;
         </a>
-        <span class="portletBottomLeft"></span>
-        <span class="portletBottomRight"></span>
-    </dd>
-</dl>
+    </footer>
+</section>
 </html>

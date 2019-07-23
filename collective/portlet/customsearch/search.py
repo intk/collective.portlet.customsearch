@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from plone.portlets.interfaces import IPortletDataProvider
 from zope.component import getMultiAdapter
 from zope.formlib import form
@@ -35,16 +38,27 @@ class ISearchPortlet(IPortletDataProvider):
         title=_(u"Placeholder"),
         required=False)
 
+    show_advanced_search = schema.Bool(
+        title=_(u"Show advanced search"),
+        required=False, default=True)
+
+    activate_facetednavigation = schema.Bool(
+        title=_(u"Activate faceted navigation"),
+        required=False, default=False)
+
+
 class Assignment(base.Assignment):
     implements(ISearchPortlet)
 
     portlet_title = u""
 
-    def __init__(self, enableLivesearch=True, portlet_title=u'', search_parameter=u'', search_placeholder=u''):
+    def __init__(self, enableLivesearch=True, portlet_title=u'', search_parameter=u'', search_placeholder=u'',show_advanced_search=True, activate_facetednavigation=False):
         self.enableLivesearch=enableLivesearch
         self.portlet_title=portlet_title
         self.search_parameter=search_parameter
         self.search_placeholder=search_placeholder
+        self.show_advanced_search=show_advanced_search
+        self.activate_facetednavigation=activate_facetednavigation
 
     @property
     def title(self):
@@ -55,6 +69,7 @@ class Renderer(base.Renderer):
 
     render = ViewPageTemplateFile('search.pt')
     action = '@@search'
+    action_faceted = 'zoeken'
     livesearch_action = 'livesearch_reply'
 
     def __init__(self, context, request, view, manager, data):
@@ -66,8 +81,17 @@ class Renderer(base.Renderer):
     def enable_livesearch(self):
         return self.data.enableLivesearch
 
+    def show_advanced_search(self):
+        return self.data.show_advanced_search
+
     def search_action(self):
-        return '{0}/{1}'.format(self.navigation_root_url, self.action)
+        action = self.action
+        try:
+            if self.data.activate_facetednavigation:
+                action = self.action_faceted
+        except:
+            action = self.action
+        return '{0}/{1}'.format(self.navigation_root_url, action)
 
     def portlet_title(self):
         return self.data.portlet_title or _(u"Search")
@@ -91,7 +115,7 @@ class Renderer(base.Renderer):
 
 
 class AddForm(base.AddForm):
-    form_fields = form.Fields(ISearchPortlet)
+    schema = ISearchPortlet
     label = _(u"Add Search Portlet")
     description = _(u"This portlet shows a search box.")
 
@@ -103,8 +127,9 @@ class AddForm(base.AddForm):
             search_placeholder=data.get('search_placeholder', u'')
         )
 
-
 class EditForm(base.EditForm):
-    form_fields = form.Fields(ISearchPortlet)
+    schema = ISearchPortlet
     label = _(u"Edit Search Portlet")
     description = _(u"This portlet shows a search box.")
+
+    
