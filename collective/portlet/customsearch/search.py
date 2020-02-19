@@ -97,18 +97,21 @@ class Renderer(base.Renderer):
         return self.data.portlet_title or _(u"Search")
 
     def search_parameter(self):
-        params = parse_qs(urlparse(self.data.search_parameter).query, keep_blank_values=True)
-        params_keys = params.keys()
+        if self.data.search_parameter:
+            params = parse_qs(urlparse(self.data.search_parameter).query, keep_blank_values=True)
+            params_keys = params.keys()
 
-        inputs = []
+            inputs = []
 
-        for key in params:
-            inputs.append({'name': key, 'values': params[key]})
+            for key in params:
+                inputs.append({'name': key, 'values': params[key]})
 
-        if len(inputs) > 0:
-            return inputs
+            if len(inputs) > 0:
+                return inputs
 
-        return self.data.search_parameter or _(u"")
+            return self.data.search_parameter or _(u"")
+        else:
+            return _(u"")
 
     def search_placeholder(self):
         return self.data.search_placeholder or _(u"")

@@ -21,9 +21,11 @@
 
   <section class="portletContent">
       <form id="searchform" action="search"
-            tal:define="livesearch view/enable_livesearch;
+            tal:define="DateTime python:modules['DateTime'].DateTime;
+                        livesearch view/enable_livesearch;
                         search_placeholder view/search_placeholder;
-                        search_parameter view/search_parameter;"
+                        search_parameter view/search_parameter;
+                        today python: DateTime().earliestTime();"
             tal:attributes="action view/search_action;
                             data-action view/search_action;
                             class python: 'search-form' if not getattr(view.data, 'activate_facetednavigation', '') else 'search-form-faceted'">
@@ -45,10 +47,14 @@
 
               />
 
-              <input class="searchButton"
+              <input type="hidden" name="start.query:record:list:date" tal:attributes="value python: today"/>
+              <input type="hidden" name="start.range:record" value="min"/>
+              <!--<input type="hidden" name="portal_type:list" value="Event"/>
+              <input type="hidden" name="advanced_search" value="True"/>-->
+
+              <button class="searchButton"
               type="submit"
-              value="Search"
-              i18n:attributes="value label_search;"/>
+              i18n:attributes="value label_search;"><i class="fa fa-search"></i></button>
 
               <tal:inputs repeat="input search_parameter">
                 <tal:values tal:define="values python: input.get('values');
@@ -71,22 +77,11 @@
           <br/>
           <div class="clearfix"></div>
 
-          <div class="visualClear div-advanced-search" tal:condition="view/show_advanced_search">
-          <a class="advanced-search" tal:attributes="href python:'/%s/@@advancedsearch' %(getattr(context,'language', 'nl'))" i18n:translate="label_advanced_search">Advanced search</a>
-        </div>
+          
         </div>
 
         
       </form>
     </section>
-
-    <footer class="portletFooter">
-        <a href="#"
-         class="tile"
-         tal:attributes="href view/search_action"
-         i18n:translate="label_advanced_search">
-        Advanced Search&hellip;
-        </a>
-    </footer>
 </section>
 </html>
